@@ -32,20 +32,10 @@ export const deleteCardById = (req: Request, res: Response) => {
     .catch(() => res.status(404).send({ message: 'Пользователь не найден' }));
 };
 
-export const likeCard = (req: any, res: Response) => {
+export const updateLike = (req: any, res: Response) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.user._id } },
-    { new: true, runValidators: true }
-  )
-    .then((card) => res.send(card?.likes))
-    .catch((err) => res.status(400).send({ message: err.message }));
-};
-
-export const disLikeCard = (req: any, res: Response) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } },
+    { [req.method === 'PUT' ? '$addToSet' : '$pull']: { likes: req.user._id } },
     { new: true, runValidators: true }
   )
     .then((card) => res.send(card?.likes))
