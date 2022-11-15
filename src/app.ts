@@ -1,4 +1,4 @@
-import express, { NextFunction, Response } from 'express';
+import express from 'express';
 import mongoose from 'mongoose';
 import { DB_CONN, PORT } from '../config';
 import { createUser, login } from './controllers/users';
@@ -9,16 +9,9 @@ mongoose.connect(DB_CONN);
 
 const app = express();
 
-app.use((req: any, _res: Response, next: NextFunction) => {
-  req.user = {
-    _id: '636eae5ef7e6c257e8183b6a',
-  };
-
-  next();
-});
 app.use(express.json());
 app.post('/signin', login);
-app.post('signup', createUser);
+app.post('/signup', createUser);
 app.use(auth);
 app.use(routes);
 
