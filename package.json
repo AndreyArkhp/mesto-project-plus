@@ -26,7 +26,8 @@
   "scripts": {
     "start": "ts-node-dev src/app.ts",
     "buld": "rm -fr dist && tsc --outDir dist",
-    "lint": "npx eslint src/**/*.ts"
+    "lint": "npx eslint src/**/*.ts",
+    "debug": "ts-node-dev src/app.ts"
   },
   "prettier": {
     "singleQuote": true
@@ -38,3 +39,5 @@
     "validator": "^13.7.0"
   }
 }
+
+
