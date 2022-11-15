@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Card from '../models/card';
+import { IRequestWithUserId } from '../../types';
 
 export const getCards = (_req: Request, res: Response) => {
   Card.find({})
@@ -7,14 +8,14 @@ export const getCards = (_req: Request, res: Response) => {
     .catch((err) => res.status(500).send({ message: err.message }));
 };
 
-export const createCard = (req: any, res: Response) => {
+export const createCard = (req: IRequestWithUserId, res: Response) => {
   const { name, link } = req.body;
   const createAd = new Date();
-  const likes: any[] = [];
+  const likes: string[] = [];
   Card.create({
     name,
     link,
-    owner: req.user._id,
+    owner: req.user?._id,
     likes,
     createAd,
   })
@@ -26,16 +27,26 @@ export const createCard = (req: any, res: Response) => {
     );
 };
 
-export const deleteCardById = (req: Request, res: Response) => {
-  Card.findByIdAndDelete(req.params.cardId)
-    .then((card) => res.send(card))
-    .catch(() => res.status(404).send({ message: 'Пользователь не найден' }));
+export const deleteCardById = (req: IRequestWithUserId, res: Response) => {
+  Card.findById(req.params.cardId)
+    .orFail(new Error('Карточка не найдена'))
+    .then((card) => {
+      if (card?.owner.toString() !== req.user?._id) {
+        throw new Error('Нельзя удалять чужие карточки');
+      } else {
+        card?.delete();
+        res.send(card);
+      }
+    })
+    .catch((err) => res.status(404).send({ message: err.message }));
 };
 
-export const updateLike = (req: any, res: Response) => {
+export const updateLike = (req: IRequestWithUserId, res: Response) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { [req.method === 'PUT' ? '$addToSet' : '$pull']: { likes: req.user._id } },
+    {
+      [req.method === 'PUT' ? '$addToSet' : '$pull']: { likes: req.user?._id },
+    },
     { new: true, runValidators: true }
   )
     .then((card) => res.send(card?.likes))

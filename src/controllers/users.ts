@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/user';
 import { expiresToken } from '../../config';
+import { IRequestWithUserId } from '../../types';
 
 export const login = (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -42,16 +43,16 @@ export const createUser = (req: Request, res: Response) => {
       res.status(400).send({
         message:
           !email || !password
-            ? 'Поля name,about,avatar,password и email обязательны'
+            ? 'Поля password и email обязательны'
             : err.message,
       })
     );
 };
 
-export const updateUser = (req: any, res: Response) => {
+export const updateUser = (req: IRequestWithUserId, res: Response) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
-    req.user._id,
+    req.user?._id,
     { name, about },
     { new: true, runValidators: true }
   )
@@ -59,13 +60,19 @@ export const updateUser = (req: any, res: Response) => {
     .catch((err) => res.status(400).send({ message: err.message }));
 };
 
-export const updateAvatar = (req: any, res: Response) => {
+export const updateAvatar = (req: IRequestWithUserId, res: Response) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
-    req.user._id,
+    req.user?._id,
     { avatar },
     { new: true, runValidators: true }
   )
     .then((newAvatar) => res.send(newAvatar))
     .catch((err) => res.status(400).send({ message: err.message }));
+};
+
+export const getMe = (req: IRequestWithUserId, res: Response) => {
+  User.findById(req.user?._id)
+    .orFail(new Error('Пользователь не найден'))
+    .then((user) => res.send(user));
 };
