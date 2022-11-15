@@ -1,12 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { IUser } from './user';
-
-interface ICard {
-  name: string;
-  link: string;
-  owner: IUser;
-  likes: string[];
-}
+import { ICard } from '../../types/card';
 
 const cardSchema = new Schema({
   name: {

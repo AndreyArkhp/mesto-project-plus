@@ -1,15 +1,9 @@
 import { Schema, model } from 'mongoose';
+import bcrypt from 'bcrypt';
 import isEmail from 'validator/lib/isEmail';
+import { IUser, IUserModel } from '../../types/user';
 
-export interface IUser {
-  name?: string;
-  about?: string;
-  avatar?: string;
-  email: string;
-  password: string;
-}
-
-const userSchema = new Schema({
+const userSchema = new Schema<IUser, IUserModel>({
   name: {
     type: String,
     minLenght: 2,
@@ -47,5 +41,23 @@ const userSchema = new Schema({
   },
 });
 
-export default model<IUser>('user', userSchema);
+userSchema.static(
+  'findUserByCredentials',
+  function findUserByCredentials(email: string, password: string) {
+    return this.findOne({ email }).then((user) => {
+      if (!user) {
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
 
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          return Promise.reject(new Error('Неправильные почта или пароль'));
+        }
+
+        return user;
+      });
+    });
+  }
+);
+
+export default model<IUser, IUserModel>('user', userSchema);
