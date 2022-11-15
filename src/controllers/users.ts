@@ -1,5 +1,22 @@
+import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
 import User from '../models/user';
+import { expiresToken } from '../../config';
+
+export const login = (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'test', {
+        expiresIn: expiresToken,
+      });
+      res.cookie('token', token, { maxAge: expiresToken, httpOnly: true });
+      res.send('Авторизация прошла успешно');
+    })
+    .catch((err) => res.status(401).send({ message: err.message }));
+};
 
 export const getUsers = (_req: Request, res: Response) => {
   User.find({})
@@ -17,13 +34,14 @@ export const getUserById = (req: Request, res: Response) => {
 
 export const createUser = (req: Request, res: Response) => {
   const { name, about, avatar, email, password } = req.body;
-
-  User.create({ name, about, avatar, password, email })
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({ name, about, avatar, password: hash, email }))
     .then((user) => res.send(user))
     .catch((err) =>
       res.status(400).send({
         message:
-          !name || !about || !avatar || !email || !password
+          !email || !password
             ? 'Поля name,about,avatar,password и email обязательны'
             : err.message,
       })
