@@ -1,47 +1,64 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
+import {
+  cardCreateSuccess,
+  cardDeleteForbidden,
+  cardDeleteSuccess,
+  cardNotFound,
+  cardsNotFound,
+} from '../constants/constants';
+import ForbiddenError from '../errors/forbiddenError';
+import NotFoundError from '../errors/notFoundError';
 import Card from '../models/card';
-import { IRequestWithJwt } from '../../types';
+import { IRequestWithJwt } from '../types';
 
-export const getCards = (_req: Request, res: Response) => {
+export const getCards = (_req: Request, res: Response, next: NextFunction) => {
   Card.find({})
+    .orFail(new NotFoundError(cardsNotFound))
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
 };
 
-export const createCard = (req: IRequestWithJwt, res: Response) => {
+export const createCard = (
+  req: IRequestWithJwt,
+  res: Response,
+  next: NextFunction
+) => {
   const { name, link } = req.body;
-  const createAd = new Date();
   const likes: string[] = [];
   Card.create({
     name,
     link,
     owner: req.user?._id,
     likes,
-    createAd,
+    createdAt: new Date(),
   })
-    .then((card) => res.send(card))
-    .catch((err) =>
-      res.status(400).send({
-        message: !link || !name ? 'Поля name и link обязательны' : err.message,
-      })
-    );
+    .then((card) => res.send({ message: cardCreateSuccess, card }))
+    .catch(next);
 };
 
-export const deleteCardById = (req: IRequestWithJwt, res: Response) => {
+export const deleteCardById = (
+  req: IRequestWithJwt,
+  res: Response,
+  next: NextFunction
+) => {
   Card.findById(req.params.cardId)
-    .orFail(new Error('Карточка не найдена'))
+    .orFail(new NotFoundError(cardNotFound))
     .then((card) => {
       if (card?.owner.toString() !== req.user?._id) {
-        throw new Error('Нельзя удалять чужие карточки');
+        throw new ForbiddenError(cardDeleteForbidden);
       } else {
         card?.delete();
-        res.send(card);
+        res.send({ message: cardDeleteSuccess, card });
       }
     })
-    .catch((err) => res.status(404).send({ message: err.message }));
+    .catch(next);
 };
 
-export const updateLike = (req: IRequestWithJwt, res: Response) => {
+export const updateLike = (
+  req: IRequestWithJwt,
+  res: Response,
+  next: NextFunction
+) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     {
@@ -49,6 +66,7 @@ export const updateLike = (req: IRequestWithJwt, res: Response) => {
     },
     { new: true, runValidators: true }
   )
+    .orFail(new NotFoundError(cardNotFound))
     .then((card) => res.send(card?.likes))
-    .catch((err) => res.status(400).send({ message: err.message }));
+    .catch(next);
 };

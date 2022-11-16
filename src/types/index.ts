@@ -12,3 +12,7 @@ interface ICastomJwtPayload extends JwtPayload {
 export interface IRequestWithJwt extends Request {
   user?: ICastomJwtPayload;
 }
+
+export interface IErrorWithStatusCode extends Error {
+  getStatusCode: number;
+}

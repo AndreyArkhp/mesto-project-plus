@@ -5,6 +5,7 @@ import { createUser, login } from './controllers/users';
 import { requestLogger, errorLogger } from './middlewares/logger';
 import auth from './middlewares/auth';
 import routes from './routes';
+import handleErrors from './middlewares/handleErrors';
 
 mongoose.connect(DB_CONN);
 
@@ -17,6 +18,7 @@ app.post('/signup', createUser);
 app.use(auth);
 app.use(routes);
 app.use(errorLogger);
+app.use(handleErrors);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

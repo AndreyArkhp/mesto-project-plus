@@ -1,7 +1,9 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcrypt';
 import isEmail from 'validator/lib/isEmail';
-import { IUser, IUserModel } from '../../types/user';
+import { IUser, IUserModel } from '../types/user';
+import UnauthorizedError from '../errors/unauthorizedError';
+import { addPassword, unauthorized } from '../constants/constants';
 
 const userSchema = new Schema<IUser, IUserModel>({
   name: {
@@ -46,17 +48,15 @@ userSchema.static(
   'findUserByCredentials',
   function findUserByCredentials(email: string, password: string) {
     return this.findOne({ email })
-      .select('+password')
+      .select(addPassword)
       .then((user) => {
         if (!user) {
-          return Promise.reject(new Error('Неправильные почта или пароль'));
+          return Promise.reject(new UnauthorizedError(unauthorized));
         }
-
         return bcrypt.compare(password, user.password).then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error('Неправильные почта или пароль'));
+            return Promise.reject(new UnauthorizedError(unauthorized));
           }
-
           return user;
         });
       });
