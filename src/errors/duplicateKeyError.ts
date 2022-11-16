@@ -1,12 +1,12 @@
-export default class BadRequestError extends Error {
+export default class DuplicateKeyError extends Error {
   private _statusCode: number;
 
   constructor(message: string) {
     super(message);
-    this._statusCode = 400;
+    this._statusCode = 409;
   }
 
-  public get getStatusCode() {
+  get getStatusCode() {
     return this._statusCode;
   }
 }

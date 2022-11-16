@@ -1,12 +1,18 @@
 export const expiresToken = 3600 * 24 * 7;
 
+export const castError = 'CastError';
+export const mongoServerError = 'MongoServerError';
+
 export const usersNotFound = 'Пользователи не найдены';
 export const userNotFound = 'Пользователь не найден';
 export const cardsNotFound = 'Карточки не найдены';
 export const cardNotFound = 'Карточка не найдена';
 export const cardDeleteForbidden = 'Нельзя удалять чужие карточки';
-export const unauthorized = 'Неправильные почта или пароль';
+export const unauthorized = 'Требуется авторизация';
 export const forbidden = 'Необходима авторизация';
+export const badRequst = 'Указаны не корректные данные';
+export const badRequstUnathorized = 'Неправильные почта или пароль';
+export const userAlreadyExist = 'Пользователь уже существует';
 
 export const logginOk = 'Вход выполнен';
 export const cardDeleteSuccess = 'Карточка удалена';

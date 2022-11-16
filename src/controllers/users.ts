@@ -5,8 +5,12 @@ import User from '../models/user';
 import { SECRET_KEY } from '../../config';
 import {
   avatarUpdateSuccess,
+  badRequst,
+  castError,
   expiresToken,
   logginOk,
+  mongoServerError,
+  userAlreadyExist,
   userCreateSuccess,
   userNotFound,
   usersNotFound,
@@ -14,6 +18,8 @@ import {
 } from '../constants/constants';
 import { IRequestWithJwt } from '../types';
 import NotFoundError from '../errors/notFoundError';
+import BadRequestError from '../errors/badRequestError';
+import DuplicateKeyError from '../errors/duplicateKeyError';
 
 export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
@@ -45,8 +51,15 @@ export const getUserById = (
 ) => {
   User.findById(req.params.id)
     .orFail(new NotFoundError(userNotFound))
-    .then((user) => res.send(user))
-    .catch(next);
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === castError) {
+        return next(new BadRequestError(badRequst));
+      }
+      next(err);
+    });
 };
 
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
@@ -55,7 +68,15 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     .hash(password, 10)
     .then((hash) => User.create({ name, about, avatar, password: hash, email }))
     .then((user) => res.send({ message: userCreateSuccess, user }))
-    .catch(next);
+    .catch((err) => {
+      if (!email || !password) {
+        return next(new BadRequestError(badRequst));
+      }
+      if (err.name === mongoServerError) {
+        return next(new DuplicateKeyError(userAlreadyExist));
+      }
+      next(err);
+    });
 };
 
 export const updateUser = (
@@ -64,6 +85,9 @@ export const updateUser = (
   next: NextFunction
 ) => {
   const { name, about } = req.body;
+  if (!name && !about) {
+    throw new BadRequestError(badRequst);
+  }
   User.findByIdAndUpdate(
     req.user?._id,
     { name, about },
@@ -80,6 +104,9 @@ export const updateAvatar = (
   next: NextFunction
 ) => {
   const { avatar } = req.body;
+  if (!avatar) {
+    throw new BadRequestError(badRequst);
+  }
   User.findByIdAndUpdate(
     req.user?._id,
     { avatar },

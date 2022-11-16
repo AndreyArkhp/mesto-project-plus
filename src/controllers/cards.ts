@@ -1,11 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import {
+  badRequst,
   cardCreateSuccess,
   cardDeleteForbidden,
   cardDeleteSuccess,
   cardNotFound,
   cardsNotFound,
+  castError,
 } from '../constants/constants';
+import BadRequestError from '../errors/badRequestError';
 import ForbiddenError from '../errors/forbiddenError';
 import NotFoundError from '../errors/notFoundError';
 import Card from '../models/card';
@@ -24,6 +27,9 @@ export const createCard = (
   next: NextFunction
 ) => {
   const { name, link } = req.body;
+  if (!name || !link) {
+    throw new BadRequestError(badRequst);
+  }
   const likes: string[] = [];
   Card.create({
     name,
@@ -51,8 +57,13 @@ export const deleteCardById = (
         res.send({ message: cardDeleteSuccess, card });
       }
     })
-    .catch(next);
-};
+    .catch((err) => {
+      if (err.name === castError) {
+        return next(new BadRequestError(badRequst));
+      }
+      next(err);
+    });
+};;
 
 export const updateLike = (
   req: IRequestWithJwt,
@@ -68,5 +79,10 @@ export const updateLike = (
   )
     .orFail(new NotFoundError(cardNotFound))
     .then((card) => res.send(card?.likes))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === castError) {
+        return next(new BadRequestError(badRequst));
+      }
+      next(err);
+    });
 };

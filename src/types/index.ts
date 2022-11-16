@@ -14,5 +14,5 @@ export interface IRequestWithJwt extends Request {
 }
 
 export interface IErrorWithStatusCode extends Error {
-  getStatusCode: number;
+  readonly getStatusCode: number;
 }
