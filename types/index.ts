@@ -5,6 +5,10 @@ export interface IRequestWithAuth extends Request {
   user?: JwtPayload | string;
 }
 
-export interface IRequestWithUserId extends Request {
-  user?: { _id: string; exp: number; iat: number };
+interface ICastomJwtPayload extends JwtPayload {
+  _id: string;
+}
+
+export interface IRequestWithJwt extends Request {
+  user?: ICastomJwtPayload;
 }

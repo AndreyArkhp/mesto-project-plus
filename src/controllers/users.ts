@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/user';
 import { expiresToken } from '../../config';
-import { IRequestWithUserId } from '../../types';
+import { IRequestWithJwt } from '../../types';
 
 export const login = (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -49,7 +49,7 @@ export const createUser = (req: Request, res: Response) => {
     );
 };
 
-export const updateUser = (req: IRequestWithUserId, res: Response) => {
+export const updateUser = (req: IRequestWithJwt, res: Response) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user?._id,
@@ -60,7 +60,7 @@ export const updateUser = (req: IRequestWithUserId, res: Response) => {
     .catch((err) => res.status(400).send({ message: err.message }));
 };
 
-export const updateAvatar = (req: IRequestWithUserId, res: Response) => {
+export const updateAvatar = (req: IRequestWithJwt, res: Response) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
     req.user?._id,
@@ -71,7 +71,7 @@ export const updateAvatar = (req: IRequestWithUserId, res: Response) => {
     .catch((err) => res.status(400).send({ message: err.message }));
 };
 
-export const getMe = (req: IRequestWithUserId, res: Response) => {
+export const getMe = (req: IRequestWithJwt, res: Response) => {
   User.findById(req.user?._id)
     .orFail(new Error('Пользователь не найден'))
     .then((user) => res.send(user));

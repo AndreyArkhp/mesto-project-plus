@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Card from '../models/card';
-import { IRequestWithUserId } from '../../types';
+import { IRequestWithJwt } from '../../types';
 
 export const getCards = (_req: Request, res: Response) => {
   Card.find({})
@@ -8,7 +8,7 @@ export const getCards = (_req: Request, res: Response) => {
     .catch((err) => res.status(500).send({ message: err.message }));
 };
 
-export const createCard = (req: IRequestWithUserId, res: Response) => {
+export const createCard = (req: IRequestWithJwt, res: Response) => {
   const { name, link } = req.body;
   const createAd = new Date();
   const likes: string[] = [];
@@ -27,7 +27,7 @@ export const createCard = (req: IRequestWithUserId, res: Response) => {
     );
 };
 
-export const deleteCardById = (req: IRequestWithUserId, res: Response) => {
+export const deleteCardById = (req: IRequestWithJwt, res: Response) => {
   Card.findById(req.params.cardId)
     .orFail(new Error('Карточка не найдена'))
     .then((card) => {
@@ -41,7 +41,7 @@ export const deleteCardById = (req: IRequestWithUserId, res: Response) => {
     .catch((err) => res.status(404).send({ message: err.message }));
 };
 
-export const updateLike = (req: IRequestWithUserId, res: Response) => {
+export const updateLike = (req: IRequestWithJwt, res: Response) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     {
