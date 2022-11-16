@@ -14,7 +14,7 @@ export const login = (req: Request, res: Response) => {
         expiresIn: expiresToken,
       });
       res.cookie('token', token, { maxAge: expiresToken, httpOnly: true });
-      res.send('Авторизация прошла успешно');
+      res.send('Вход выполнен');
     })
     .catch((err) => res.status(401).send({ message: err.message }));
 };
