@@ -7,8 +7,6 @@ const handleErrors = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log('error :', err.name);
-
   const { getStatusCode: statusCode = 500, message } = err;
   res
     .status(statusCode)

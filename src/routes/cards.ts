@@ -5,13 +5,17 @@ import {
   getCards,
   updateLike,
 } from '../controllers/cards';
+import {
+  createCardValidator,
+  cardParamsValidator,
+} from '../validation/cerebrateValidators';
 
 const cardsRouter = Router();
 
 cardsRouter.get('/', getCards);
-cardsRouter.post('/', createCard);
-cardsRouter.delete('/:cardId', deleteCardById);
-cardsRouter.put('/:cardId/likes', updateLike);
-cardsRouter.delete('/:cardId/likes', updateLike);
+cardsRouter.post('/', createCardValidator, createCard);
+cardsRouter.delete('/:cardId', cardParamsValidator, deleteCardById);
+cardsRouter.put('/:cardId/likes', cardParamsValidator, updateLike);
+cardsRouter.delete('/:cardId/likes', cardParamsValidator, updateLike);
 
 export default cardsRouter;

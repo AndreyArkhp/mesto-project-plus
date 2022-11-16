@@ -13,6 +13,7 @@ export const forbidden = 'Необходима авторизация';
 export const badRequst = 'Указаны не корректные данные';
 export const badRequstUnathorized = 'Неправильные почта или пароль';
 export const userAlreadyExist = 'Пользователь уже существует';
+export const notUrl = 'Не корректная ссылка';
 
 export const logginOk = 'Вход выполнен';
 export const cardDeleteSuccess = 'Карточка удалена';
@@ -22,3 +23,6 @@ export const userUpdateSuccess = 'Данные пользователя обно
 export const avatarUpdateSuccess = 'Аватар обновлен';
 
 export const addPassword = '+password';
+
+export const urlPattern =
+  /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;

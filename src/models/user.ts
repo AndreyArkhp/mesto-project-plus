@@ -3,7 +3,8 @@ import bcrypt from 'bcrypt';
 import isEmail from 'validator/lib/isEmail';
 import { IUser, IUserModel } from '../types/user';
 import UnauthorizedError from '../errors/unauthorizedError';
-import { addPassword, unauthorized } from '../constants/constants';
+import { addPassword, notUrl, unauthorized } from '../constants/constants';
+import { isAvatarLink } from '../validation/schemaValidators';
 
 const userSchema = new Schema<IUser, IUserModel>({
   name: {
@@ -23,6 +24,10 @@ const userSchema = new Schema<IUser, IUserModel>({
   avatar: {
     type: String,
     required: false,
+    validate: {
+      validator: isAvatarLink,
+      message: notUrl,
+    },
     default:
       'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
