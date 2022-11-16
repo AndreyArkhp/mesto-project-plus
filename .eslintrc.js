@@ -19,7 +19,9 @@ module.exports = {
     'import/extensions': ['.js', '.ts'],
   },
   rules: {
-    'no-console': 'off',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': 'error',
+    'consistent-return': 'off',
     'import/extensions': [
       'error',
       'ignorePackages',
@@ -28,6 +30,6 @@ module.exports = {
         ts: 'never',
       },
     ],
-    'no-underscore-dangle': ['error', { allow: ['_id'] }],
+    'no-underscore-dangle': ['error', { allow: ['_id', '_statusCode'] }],
   },
 };

@@ -1,12 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { IUser } from './user';
-
-interface ICard {
-  name: string;
-  link: string;
-  owner: IUser;
-  likes: string[];
-}
+import { ICard } from '../types/card';
 
 const cardSchema = new Schema({
   name: {
@@ -22,9 +15,14 @@ const cardSchema = new Schema({
   owner: {
     type: Schema.Types.ObjectId,
     ref: 'user',
+    require: true,
   },
   likes: [{ type: Schema.Types.ObjectId, ref: 'user' }],
-  createdAt: Date,
+  createdAt: {
+    type: Date,
+    require: true,
+    default: Date.now(),
+  },
 });
 
 export default model<ICard>('card', cardSchema);
