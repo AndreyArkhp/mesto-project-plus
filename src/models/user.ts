@@ -65,7 +65,7 @@ userSchema.static(
           return user;
         });
       });
-  }
+  },
 );
 
 export default model<IUser, IUserModel>('user', userSchema);

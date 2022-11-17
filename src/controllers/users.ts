@@ -47,7 +47,7 @@ export const getUsers = (_req: Request, res: Response, next: NextFunction) => {
 export const getUserById = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   User.findById(req.params.id)
     .orFail(new NotFoundError(userNotFound))
@@ -63,10 +63,14 @@ export const getUserById = (
 };
 
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   bcrypt
     .hash(password, 10)
-    .then((hash) => User.create({ name, about, avatar, password: hash, email }))
+    .then((hash) => User.create({
+      name, about, avatar, password: hash, email,
+    }))
     .then((user) => res.send({ message: userCreateSuccess, user }))
     .catch((err) => {
       if (!email || !password) {
@@ -82,7 +86,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
 export const updateUser = (
   req: IRequestWithJwt,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { name, about } = req.body;
   if (!name && !about) {
@@ -91,7 +95,7 @@ export const updateUser = (
   User.findByIdAndUpdate(
     req.user?._id,
     { name, about },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .orFail(new NotFoundError(userNotFound))
     .then((user) => res.send({ message: userUpdateSuccess, user }))
@@ -101,7 +105,7 @@ export const updateUser = (
 export const updateAvatar = (
   req: IRequestWithJwt,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { avatar } = req.body;
   if (!avatar) {
@@ -110,7 +114,7 @@ export const updateAvatar = (
   User.findByIdAndUpdate(
     req.user?._id,
     { avatar },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .orFail(new NotFoundError(userNotFound))
     .then((newAvatar) => res.send({ message: avatarUpdateSuccess, newAvatar }))
@@ -120,7 +124,7 @@ export const updateAvatar = (
 export const getMe = (
   req: IRequestWithJwt,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   User.findById(req.user?._id)
     .orFail(new NotFoundError(userNotFound))

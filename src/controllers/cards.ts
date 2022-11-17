@@ -24,7 +24,7 @@ export const getCards = (_req: Request, res: Response, next: NextFunction) => {
 export const createCard = (
   req: IRequestWithJwt,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { name, link } = req.body;
   if (!name || !link) {
@@ -45,7 +45,7 @@ export const createCard = (
 export const deleteCardById = (
   req: IRequestWithJwt,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   Card.findById(req.params.cardId)
     .orFail(new NotFoundError(cardNotFound))
@@ -63,19 +63,19 @@ export const deleteCardById = (
       }
       next(err);
     });
-};;
+};
 
 export const updateLike = (
   req: IRequestWithJwt,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     {
       [req.method === 'PUT' ? '$addToSet' : '$pull']: { likes: req.user?._id },
     },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .orFail(new NotFoundError(cardNotFound))
     .then((card) => res.send(card?.likes))
