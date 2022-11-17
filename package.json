@@ -2,7 +2,7 @@
   "name": "mesto_api",
   "version": "1.0.0",
   "description": "server for project MESTO",
-  "main": "index.js",
+  "main": "app.ts",
   "author": "Andrey Arkhipov",
   "license": "MIT",
   "devDependencies": {
@@ -26,10 +26,10 @@
     "typescript": "*"
   },
   "scripts": {
-    "start": "ts-node-dev src/app.ts",
-    "buld": "rm -fr dist && tsc --outDir dist",
+    "start": "ts-node src/app.ts",
+    "build": "rm -fr dist && tsc --outDir dist",
     "lint": "npx eslint src/**/*.ts",
-    "debug": "ts-node src/app.ts"
+    "dev": "ts-node-dev src/app.ts"
   },
   "prettier": {
     "singleQuote": true
