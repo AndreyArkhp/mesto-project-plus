@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { ICard } from '../types/card';
 
-const cardSchema = new Schema({
+const cardSchema = new Schema<ICard>({
   name: {
     type: String,
     minLength: 2,

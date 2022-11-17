@@ -5,4 +5,5 @@ export interface ICard {
   link: string;
   owner: IUser;
   likes: string[];
+  createdAt: Date;
 }
