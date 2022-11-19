@@ -9,7 +9,6 @@ import auth from './middlewares/auth';
 import routes from './routes';
 import handleErrors from './middlewares/handleErrors';
 import {
-  headersValidator,
   createUserValidator,
   logginValidator,
 } from './validation/cerebrateValidators';
@@ -23,7 +22,7 @@ app.use(cookieParser());
 app.use(requestLogger);
 app.post('/signin', logginValidator, login);
 app.post('/signup', createUserValidator, createUser);
-app.use(headersValidator, auth);
+app.use(auth);
 app.use(routes);
 app.use(errorLogger);
 app.use(errors());

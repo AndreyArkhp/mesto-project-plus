@@ -28,8 +28,7 @@ const userSchema = new Schema<IUser, IUserModel>({
     required: false,
     default: defaultUserAvatar,
     validate: {
-      validator:
-        isAvatarLink,
+      validator: isAvatarLink,
       message: notUrl,
     },
   },

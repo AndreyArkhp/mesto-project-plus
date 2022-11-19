@@ -15,6 +15,7 @@ import {
   userNotFound,
   usersNotFound,
   userUpdateSuccess,
+  validationsError,
 } from '../constants/constants';
 import { IRequestWithJwt } from '../types';
 import NotFoundError from '../errors/notFoundError';
@@ -77,8 +78,10 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     }))
     .then((user) => res.send({ message: userCreateSuccess, user }))
     .catch((err) => {
-      if (err.code === existUserCode) {
-        return next(new DuplicateKeyError(userAlreadyExist));
+      if (err.name === validationsError) {
+        next(new BadRequestError(badRequst));
+      } else if (err.code === existUserCode) {
+        next(new DuplicateKeyError(userAlreadyExist));
       }
       next(err);
     });
