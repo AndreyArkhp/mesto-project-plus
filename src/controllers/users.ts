@@ -69,7 +69,11 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
   bcrypt
     .hash(password, 10)
     .then((hash) => User.create({
-      name, about, avatar, password: hash, email,
+      name,
+      about,
+      avatar,
+      password: hash,
+      email,
     }))
     .then((user) => res.send({ message: userCreateSuccess, user }))
     .catch((err) => {
@@ -89,9 +93,6 @@ export const updateUser = (
   next: NextFunction,
 ) => {
   const { name, about } = req.body;
-  if (!name && !about) {
-    throw new BadRequestError(badRequst);
-  }
   User.findByIdAndUpdate(
     req.user?._id,
     { name, about },
@@ -108,9 +109,6 @@ export const updateAvatar = (
   next: NextFunction,
 ) => {
   const { avatar } = req.body;
-  if (!avatar) {
-    throw new BadRequestError(badRequst);
-  }
   User.findByIdAndUpdate(
     req.user?._id,
     { avatar },

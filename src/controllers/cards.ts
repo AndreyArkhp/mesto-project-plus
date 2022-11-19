@@ -27,9 +27,6 @@ export const createCard = (
   next: NextFunction,
 ) => {
   const { name, link } = req.body;
-  if (!name || !link) {
-    throw new BadRequestError(badRequst);
-  }
   const likes: string[] = [];
   Card.create({
     name,
