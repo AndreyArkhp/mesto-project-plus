@@ -3,7 +3,9 @@ import bcrypt from 'bcrypt';
 import isEmail from 'validator/lib/isEmail';
 import { IUser, IUserModel } from '../types/user';
 import UnauthorizedError from '../errors/unauthorizedError';
-import { addPassword, notUrl, unauthorized } from '../constants/constants';
+import {
+  addPassword, defaultUserAbout, defaultUserAvatar, defaultUserName, notEmail, notUrl, unauthorized,
+} from '../constants/constants';
 import { isAvatarLink } from '../validation/schemaValidators';
 
 const userSchema = new Schema<IUser, IUserModel>({
@@ -12,24 +14,24 @@ const userSchema = new Schema<IUser, IUserModel>({
     minLenght: 2,
     maxLingth: 30,
     required: false,
-    default: 'Жак-Ив Кусто',
+    default: defaultUserName,
   },
   about: {
     type: String,
     minLenght: 2,
     maxLength: 200,
     required: false,
-    default: 'Исследователь',
+    default: defaultUserAbout,
   },
   avatar: {
     type: String,
     required: false,
+    default: defaultUserAvatar,
     validate: {
-      validator: isAvatarLink,
+      validator:
+        isAvatarLink,
       message: notUrl,
     },
-    default:
-      'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
   email: {
     type: String,
@@ -37,9 +39,9 @@ const userSchema = new Schema<IUser, IUserModel>({
     unique: true,
     validate: {
       validator(email: string) {
-        return isEmail(email);
+        isEmail(email);
       },
-      message: 'Некорректный email',
+      message: notEmail,
     },
   },
   password: {

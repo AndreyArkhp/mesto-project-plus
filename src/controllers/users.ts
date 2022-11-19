@@ -7,9 +7,9 @@ import {
   avatarUpdateSuccess,
   badRequst,
   castError,
+  existUserCode,
   expiresToken,
   logginOk,
-  mongoServerError,
   userAlreadyExist,
   userCreateSuccess,
   userNotFound,
@@ -77,10 +77,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     }))
     .then((user) => res.send({ message: userCreateSuccess, user }))
     .catch((err) => {
-      if (!email || !password) {
-        return next(new BadRequestError(badRequst));
-      }
-      if (err.name === mongoServerError) {
+      if (err.code === existUserCode) {
         return next(new DuplicateKeyError(userAlreadyExist));
       }
       next(err);
