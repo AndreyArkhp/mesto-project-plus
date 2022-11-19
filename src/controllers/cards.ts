@@ -13,6 +13,7 @@ import ForbiddenError from '../errors/forbiddenError';
 import NotFoundError from '../errors/notFoundError';
 import Card from '../models/card';
 import { IRequestWithJwt } from '../types';
+import { ICard } from '../types/card';
 
 export const getCards = (_req: Request, res: Response, next: NextFunction) => {
   Card.find({})
@@ -50,8 +51,9 @@ export const deleteCardById = (
       if (card?.owner.toString() !== req.user?._id) {
         throw new ForbiddenError(cardDeleteForbidden);
       } else {
-        card?.delete();
-        res.send({ message: cardDeleteSuccess, card });
+        card?.deleteOne()
+          .then((removedCard: ICard) => res.send({ message: cardDeleteSuccess, card: removedCard }))
+          .catch(next);
       }
     })
     .catch((err) => {
