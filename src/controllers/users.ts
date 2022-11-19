@@ -7,14 +7,15 @@ import {
   avatarUpdateSuccess,
   badRequst,
   castError,
+  existUserCode,
   expiresToken,
   logginOk,
-  mongoServerError,
   userAlreadyExist,
   userCreateSuccess,
   userNotFound,
   usersNotFound,
   userUpdateSuccess,
+  validationsError,
 } from '../constants/constants';
 import { IRequestWithJwt } from '../types';
 import NotFoundError from '../errors/notFoundError';
@@ -47,7 +48,7 @@ export const getUsers = (_req: Request, res: Response, next: NextFunction) => {
 export const getUserById = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   User.findById(req.params.id)
     .orFail(new NotFoundError(userNotFound))
@@ -63,17 +64,24 @@ export const getUserById = (
 };
 
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   bcrypt
     .hash(password, 10)
-    .then((hash) => User.create({ name, about, avatar, password: hash, email }))
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      password: hash,
+      email,
+    }))
     .then((user) => res.send({ message: userCreateSuccess, user }))
     .catch((err) => {
-      if (!email || !password) {
-        return next(new BadRequestError(badRequst));
-      }
-      if (err.name === mongoServerError) {
-        return next(new DuplicateKeyError(userAlreadyExist));
+      if (err.name === validationsError) {
+        next(new BadRequestError(badRequst));
+      } else if (err.code === existUserCode) {
+        next(new DuplicateKeyError(userAlreadyExist));
       }
       next(err);
     });
@@ -82,16 +90,13 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
 export const updateUser = (
   req: IRequestWithJwt,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { name, about } = req.body;
-  if (!name && !about) {
-    throw new BadRequestError(badRequst);
-  }
   User.findByIdAndUpdate(
     req.user?._id,
     { name, about },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .orFail(new NotFoundError(userNotFound))
     .then((user) => res.send({ message: userUpdateSuccess, user }))
@@ -101,16 +106,13 @@ export const updateUser = (
 export const updateAvatar = (
   req: IRequestWithJwt,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { avatar } = req.body;
-  if (!avatar) {
-    throw new BadRequestError(badRequst);
-  }
   User.findByIdAndUpdate(
     req.user?._id,
     { avatar },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .orFail(new NotFoundError(userNotFound))
     .then((newAvatar) => res.send({ message: avatarUpdateSuccess, newAvatar }))
@@ -120,7 +122,7 @@ export const updateAvatar = (
 export const getMe = (
   req: IRequestWithJwt,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   User.findById(req.user?._id)
     .orFail(new NotFoundError(userNotFound))

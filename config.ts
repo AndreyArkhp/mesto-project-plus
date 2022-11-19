@@ -7,5 +7,3 @@ export const {
   DB_CONN = 'mongodb://localhost:27017/mestodb',
   SECRET_KEY = 'secret-string',
 } = process.env;
-
-

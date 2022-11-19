@@ -5,7 +5,7 @@ const handleErrors = (
   err: IErrorWithStatusCode,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { getStatusCode: statusCode = 500, message } = err;
   res

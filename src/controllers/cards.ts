@@ -13,6 +13,7 @@ import ForbiddenError from '../errors/forbiddenError';
 import NotFoundError from '../errors/notFoundError';
 import Card from '../models/card';
 import { IRequestWithJwt } from '../types';
+import { ICard } from '../types/card';
 
 export const getCards = (_req: Request, res: Response, next: NextFunction) => {
   Card.find({})
@@ -24,12 +25,9 @@ export const getCards = (_req: Request, res: Response, next: NextFunction) => {
 export const createCard = (
   req: IRequestWithJwt,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { name, link } = req.body;
-  if (!name || !link) {
-    throw new BadRequestError(badRequst);
-  }
   const likes: string[] = [];
   Card.create({
     name,
@@ -45,7 +43,7 @@ export const createCard = (
 export const deleteCardById = (
   req: IRequestWithJwt,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   Card.findById(req.params.cardId)
     .orFail(new NotFoundError(cardNotFound))
@@ -53,8 +51,9 @@ export const deleteCardById = (
       if (card?.owner.toString() !== req.user?._id) {
         throw new ForbiddenError(cardDeleteForbidden);
       } else {
-        card?.delete();
-        res.send({ message: cardDeleteSuccess, card });
+        card?.deleteOne()
+          .then((removedCard: ICard) => res.send({ message: cardDeleteSuccess, card: removedCard }))
+          .catch(next);
       }
     })
     .catch((err) => {
@@ -63,19 +62,19 @@ export const deleteCardById = (
       }
       next(err);
     });
-};;
+};
 
 export const updateLike = (
   req: IRequestWithJwt,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     {
       [req.method === 'PUT' ? '$addToSet' : '$pull']: { likes: req.user?._id },
     },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .orFail(new NotFoundError(cardNotFound))
     .then((card) => res.send(card?.likes))
