@@ -24,7 +24,7 @@
   },
   "scripts": {
     "start": "ts-node src/app.ts",
-    "build": "rm -fr dist && tsc --outDir dist",
+    "build": "rm -fr dist && tsc",
     "lint": "npx eslint src/**/*.ts",
     "dev": "ts-node-dev src/app.ts"
   },
