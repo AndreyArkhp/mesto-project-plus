@@ -82,8 +82,9 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
         next(new BadRequestError(badRequst));
       } else if (err.code === existUserCode) {
         next(new DuplicateKeyError(userAlreadyExist));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
