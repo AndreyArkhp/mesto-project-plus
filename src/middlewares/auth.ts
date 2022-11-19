@@ -7,11 +7,11 @@ import UnauthorizedError from '../errors/unauthorizedError';
 import { IRequestWithAuth } from '../types';
 
 export default (req: IRequestWithAuth, res: Response, next: NextFunction) => {
-  const { authorization } = req.headers;
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  const { token } = req.cookies;
+
+  if (!token) {
     throw new UnauthorizedError(unauthorized);
   }
-  const token = authorization.replace('Bearer ', '');
   let payload;
   try {
     payload = jwt.verify(token, SECRET_KEY);

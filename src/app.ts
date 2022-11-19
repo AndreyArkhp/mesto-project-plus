@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import { errors } from 'celebrate';
+import cookieParser from 'cookie-parser';
 import { DB_CONN, PORT } from '../config';
 import { createUser, login } from './controllers/users';
 import { requestLogger, errorLogger } from './middlewares/logger';
@@ -18,6 +19,7 @@ mongoose.connect(DB_CONN);
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(requestLogger);
 app.post('/signin', logginValidator, login);
 app.post('/signup', createUserValidator, createUser);

@@ -51,6 +51,6 @@ export const cardParamsValidator = celebrate({
 
 export const headersValidator = celebrate({
   headers: Joi.object({
-    authorization: Joi.string().length(179).required(),
+    cookie: Joi.string().length(178).required(),
   }).unknown(),
 });
